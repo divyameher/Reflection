@@ -1,0 +1,17 @@
+{
+    "DllPath": "D:\\My Learnings\\.Net Core\\Calculator\\bin\\Debug\\netcoreapp2.2\\Calculator.dll",
+    "ClassName": "Calculator.Calculator",
+    "Methods": [
+        {
+            "Name": "WelcomeMessage",
+            "Params": null
+        },
+        {
+            "Name": "AddTwoNums",
+            "Params": [
+                20,
+                30
+            ]
+        }
+    ]
+}

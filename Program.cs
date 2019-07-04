@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace Reflection
 {
@@ -7,18 +10,24 @@ namespace Reflection
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter Full Dll Path");
-            string assemblyPath = Console.ReadLine();
-            Console.WriteLine("Enter RunTime Class Name");
-            string className = Console.ReadLine();
-            Console.WriteLine("Enter Method Name in Class");
-            string methodName = Console.ReadLine();
+            // Console.WriteLine("Enter Full Dll Path");
+            // string assemblyPath = Console.ReadLine();
+            // Console.WriteLine("Enter RunTime Class Name");
+            // string className = Console.ReadLine();
+            // Console.WriteLine("Enter Method Name in Class");
+            // string methodName = Console.ReadLine();
+            InputJsonModel inputJsonModel;
+            using (StreamReader r = new StreamReader("InputData/data.json"))
+            {
+                string json = r.ReadToEnd();
+                inputJsonModel = JsonConvert.DeserializeObject<InputJsonModel>(json);
+            }
             // dynamically load assembly
             Assembly testAssembly =
             //  Assembly.LoadFile(@"D:\My Learnings\.Net Core\Calculator\bin\Debug\netcoreapp2.2\Calculator.dll");
-            Assembly.LoadFile(@assemblyPath);
+            Assembly.LoadFile(@inputJsonModel.DllPath);
             // get type of class from just loaded assembly
-            Type classType = testAssembly.GetType(className);
+            Type classType = testAssembly.GetType(inputJsonModel.ClassName);
             // System.Console.WriteLine(testAssembly.ExportedTypes);
 
             // create instance of class Class
@@ -31,10 +40,22 @@ namespace Reflection
             // string value = (string)messagePropertyInfo.GetValue(calcInstance, null);
             // Console.WriteLine(value);
             // Get info about method
-            MethodInfo methodInfo = classType.GetMethod(methodName);
-            // Call Method
-            methodInfo.Invoke(classInstance, null);
-
+            foreach (var method in inputJsonModel.Methods)
+            {
+                MethodInfo methodInfo = classType.GetMethod(method.Name);
+                // ParameterInfo[] parameters = methodInfo.GetParameters();
+                // foreach (string param in method.Params)
+                // {
+                //     foreach (ParameterInfo parameter in parameters)
+                //     {
+                //         method.Params = Convert.ChangeType(param, parameter.ParameterType);
+                //     }
+                // }
+                // Call Method
+                var returnValue = methodInfo.Invoke(classInstance, method.Params);
+                if (returnValue != null)
+                    Console.WriteLine($"Return Value of {method.Name} is : {returnValue}");
+            }
         }
     }
 }
